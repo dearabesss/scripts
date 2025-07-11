@@ -1,7 +1,3 @@
--- Murder Mystery 2 Power GUI
--- Features: ESP, God Mode, Noclip, Speed, Auto Collect Coins, Grab Gun, Invisibility
--- Optimized to reduce lag when becoming murderer
-
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -24,7 +20,6 @@ local function protectInstance(instance)
     end
 end
 
--- Settings
 local settings = {
     revealRoles = false,
     godMode = false,
@@ -42,13 +37,11 @@ local settings = {
     espUpdateInterval = 0.5
 }
 
--- ESP Setup
 local espParts = {}
 local espLabels = {}
 local roleCache = {}
 local lastEspUpdate = 0
 
--- Create ESP for player
 local function createESP(player)
     if espParts[player] or player == LocalPlayer then return end
     
@@ -160,7 +153,6 @@ local function createESP(player)
     end)
 end
 
--- Remove ESP
 local function removeESP(player)
     if espParts[player] then
         espParts[player]:Destroy()
@@ -177,7 +169,7 @@ local function removeESP(player)
     roleCache[player] = nil
 end
 
--- Update ESP
+
 local function updateESP()
     if not settings.revealRoles or tick() - lastEspUpdate < settings.espUpdateInterval then return end
     lastEspUpdate = tick()
@@ -195,7 +187,6 @@ local function updateESP()
     end
 end
 
--- Player handlers
 local function onPlayerAdded(player)
     player.CharacterAdded:Connect(function()
         if settings.revealRoles then
@@ -217,7 +208,6 @@ end
 Players.PlayerAdded:Connect(onPlayerAdded)
 Players.PlayerRemoving:Connect(removeESP)
 
--- Gun Handling
 local function findNearestGun()
     local char = LocalPlayer.Character
     if not char or not char:FindFirstChild("HumanoidRootPart") then return nil end
@@ -274,7 +264,6 @@ local function autoPickGun()
     end
 end
 
--- Teleport to Sheriff
 local function teleportToSheriff()
     local char = LocalPlayer.Character
     if not char or not char:FindFirstChild("HumanoidRootPart") then return end
@@ -314,7 +303,6 @@ local function setInvisibility(state)
     settings.invisible = state
 end
 
--- Auto Collect Coins
 local lastCoinCollect = 0
 local coinCollectCooldown = 0.3
 
@@ -350,7 +338,6 @@ local function collectCoins()
     end
 end
 
--- GUI Setup
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "MM2PowerGUI_"..tostring(math.random(10000,99999))
 screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
@@ -367,7 +354,6 @@ mainContainer.BorderSizePixel = 0
 mainContainer.Parent = screenGui
 protectInstance(mainContainer)
 
--- Make GUI draggable
 local dragging
 local dragInput
 local dragStart
@@ -409,7 +395,6 @@ uiCorner.CornerRadius = UDim.new(0, 10)
 uiCorner.Parent = mainContainer
 protectInstance(uiCorner)
 
--- Title Bar
 local titleBar = Instance.new("Frame")
 titleBar.Size = UDim2.new(1, 0, 0, 40)
 titleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
@@ -506,7 +491,6 @@ toggleGuiButton.MouseButton1Click:Connect(function()
     mainContainer.Visible = settings.guiVisible
 end)
 
--- Three Panel Layout
 local leftPanel = Instance.new("Frame")
 leftPanel.Name = "LeftPanel"
 leftPanel.Size = UDim2.new(0.33, -5, 1, -40)
@@ -531,7 +515,6 @@ rightPanel.BackgroundTransparency = 1
 rightPanel.Parent = mainContainer
 protectInstance(rightPanel)
 
--- Left Panel (Main Settings)
 local leftTitle = Instance.new("TextLabel")
 leftTitle.Size = UDim2.new(1, 0, 0, 30)
 leftTitle.Text = "Main Settings"
@@ -654,7 +637,6 @@ grabGunButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Middle Panel (Movement)
 local middleTitle = Instance.new("TextLabel")
 middleTitle.Size = UDim2.new(1, 0, 0, 30)
 middleTitle.Text = "Movement"
@@ -772,7 +754,6 @@ autoCollectButton.MouseButton1Click:Connect(function()
     autoCollectButton.Text = "Auto Collect: " .. (settings.autoCollectCoins and "ON" or "OFF")
 end)
 
--- Right Panel (Information)
 local rightTitle = Instance.new("TextLabel")
 rightTitle.Size = UDim2.new(1, 0, 0, 30)
 rightTitle.Text = "Information"
@@ -826,9 +807,8 @@ local function createClickableLabel(parent, text, position, url)
     return label
 end
 
--- Create clickable links
-createClickableLabel(rightPanel, "Discord: example#1234", UDim2.new(0.05, 0, 0.1, 0), "https://discord.gg/")
-createClickableLabel(rightPanel, "YouTube: example", UDim2.new(0.05, 0, 0.2, 0), "https://youtube.com/")
+createClickableLabel(rightPanel, "Discord: aliyan69", UDim2.new(0.05, 0, 0.1, 0), "https://discord.gg/")
+createClickableLabel(rightPanel, "YouTube: rblxScripts", UDim2.new(0.05, 0, 0.2, 0), "https://youtube.com/")
 
 local statusLabel = Instance.new("TextLabel")
 statusLabel.Size = UDim2.new(0.9, 0, 0, 60)
@@ -841,7 +821,6 @@ statusLabel.TextSize = 14
 statusLabel.Parent = rightPanel
 protectInstance(statusLabel)
 
--- Noclip Implementation
 local function applyNoclip(char)
     if not char or not char:FindFirstChild("HumanoidRootPart") then return end
     local rootPart = char.HumanoidRootPart
@@ -879,19 +858,16 @@ local function applyNoclip(char)
     end
 end
 
--- Character Handler
 local function onCharacterAdded(char)
     local humanoid = char:WaitForChild("Humanoid")
     local rootPart = char:WaitForChild("HumanoidRootPart")
     
-    -- Check if we became murderer to adjust performance
     local isMurderer = false
     local function checkRole()
         local backpack = LocalPlayer:FindFirstChild("Backpack")
         local char = LocalPlayer.Character
         isMurderer = (backpack and backpack:FindFirstChild("Knife")) or (char and char:FindFirstChild("Knife"))
         
-        -- Adjust ESP update frequency if murderer
         settings.espUpdateInterval = isMurderer and 1 or 0.5
     end
     
@@ -928,11 +904,11 @@ local function onCharacterAdded(char)
         humanoid.WalkSpeed = settings.speed
     end
     
-    -- Main game loop with optimized updates
+    
     RunService.Stepped:Connect(function()
         applyNoclip(char)
         
-        -- Only run these features occasionally when murderer to reduce lag
+    
         if not isMurderer or tick() % 2 < 0.1 then
             autoPickGun()
             collectCoins()
@@ -943,12 +919,12 @@ end
 LocalPlayer.CharacterAdded:Connect(onCharacterAdded)
 if LocalPlayer.Character then onCharacterAdded(LocalPlayer.Character) end
 
--- Optimized ESP updates
+
 RunService.RenderStepped:Connect(function()
     updateESP()
 end)
 
--- F1 Hotkey for GUI Toggle
+
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if not gameProcessed and input.KeyCode == Enum.KeyCode.F1 then
         settings.guiVisible = not settings.guiVisible
@@ -956,13 +932,12 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     end
 end)
 
--- Anti-AFK
+
 local VirtualUser = game:GetService("VirtualUser")
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
     VirtualUser:CaptureController()
     VirtualUser:ClickButton2(Vector2.new())
 end)
 
--- Randomize script name to prevent detection
 local scriptName = "MM2Power_"..tostring(math.random(10000,99999))
 getgenv()[scriptName] = true
