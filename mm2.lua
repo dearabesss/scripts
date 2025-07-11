@@ -6,7 +6,7 @@ local LocalPlayer = Players.LocalPlayer
 local HttpService = game:GetService("HttpService")
 if not LocalPlayer then return end
 
--- Anti-detection measures
+
 local function protectInstance(instance)
     if not instance then return end
     for _,v in pairs(getconnections(instance.Changed)) do
